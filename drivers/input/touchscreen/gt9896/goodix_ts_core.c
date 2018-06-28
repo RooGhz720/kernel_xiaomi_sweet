@@ -1258,7 +1258,7 @@ static irqreturn_t goodix_ts_threadirq_func(int irq, void *data)
 		r = ext_module->funcs->irq_event(core_data, ext_module);
 		if (r == EVT_CANCEL_IRQEVT) {
 			mutex_unlock(&goodix_modules.mutex);
-			return IRQ_HANDLED;
+			goto handled;
 		}
 	}
 	mutex_unlock(&goodix_modules.mutex);
@@ -1283,6 +1283,8 @@ static irqreturn_t goodix_ts_threadirq_func(int irq, void *data)
 	irq_flag = 0;
 	ts_dev->hw_ops->write_trans(ts_dev, ts_dev->reg.coor, &irq_flag, 1);
 
+handled:
+	pm_qos_update_request(&core_data->pm_touch_req, PM_QOS_DEFAULT_VALUE);
 	return IRQ_HANDLED;
 }
 
@@ -1314,6 +1316,10 @@ int goodix_ts_irq_setup(struct goodix_ts_core *core_data)
 	} else {
 		atomic_set(&core_data->irq_enabled, 1);
 	}
+	core_data->pm_touch_req.type = PM_QOS_REQ_AFFINE_IRQ;
+	core_data->pm_touch_req.irq = core_data->irq;
+	pm_qos_add_request(&core_data->pm_touch_req, PM_QOS_CPU_DMA_LATENCY,
+			   PM_QOS_DEFAULT_VALUE);
 	return r;
 }
 
@@ -3148,6 +3154,8 @@ static int goodix_ts_probe(struct platform_device *pdev)
 	core_data->pdev = pdev;
 	core_data->ts_dev = ts_device;
 	platform_set_drvdata(pdev, core_data);
+
+	pm_qos_update_request(&core_data->pm_touch_req, 100);
 
 	client = to_i2c_client(ts_device->dev);
 	i2c_set_clientdata(client, core_data);

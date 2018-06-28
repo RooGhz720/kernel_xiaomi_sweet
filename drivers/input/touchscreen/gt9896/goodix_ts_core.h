@@ -53,6 +53,7 @@
 #include <linux/notifier.h>
 #include <linux/fb.h>
 #endif
+#include <linux/pm_qos.h>
 
 #define GOODIX_FLASH_CONFIG_WITH_ISP	1
 /* macros definition */
@@ -552,6 +553,8 @@ struct goodix_ts_core {
 	 * only for MTK platform
 	 * struct pm_qos_request tp_qos_request;
 	 */
+
+	struct pm_qos_request pm_touch_req;
 };
 
 /* external module structures */
