@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, The Linux foundation. All rights reserved.
+ * Copyright (c) 2017-2021, The Linux foundation. All rights reserved.
  * Copyright (C) 2021 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -2107,6 +2107,7 @@ static void msm_geni_serial_handle_isr(struct uart_port *uport,
 				IPC_LOG_MSG(msm_port->ipc_log_misc,
 					"%s.Reset done.  0x%x.\n",
 						__func__, dma_rx_status);
+				s_cmd_done = true;
 				goto exit_geni_serial_isr;
 			}
 
