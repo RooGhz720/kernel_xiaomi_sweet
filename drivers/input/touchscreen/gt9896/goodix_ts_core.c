@@ -1284,7 +1284,8 @@ static irqreturn_t goodix_ts_threadirq_func(int irq, void *data)
 	ts_dev->hw_ops->write_trans(ts_dev, ts_dev->reg.coor, &irq_flag, 1);
 
 handled:
-	pm_qos_update_request(&core_data->pm_touch_req, PM_QOS_DEFAULT_VALUE);
+	if (pm_qos_request_active(&core_data->pm_touch_req))
+		pm_qos_update_request(&core_data->pm_touch_req, PM_QOS_DEFAULT_VALUE);
 	return IRQ_HANDLED;
 }
 
